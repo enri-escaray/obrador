@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: ruff check
+        uses: astral-sh/ruff-action@v4
+        with:
+          version: "0.16.8"
+          args: check
+
+      - name: ruff format
+        uses: astral-sh/ruff-action@v4
+        with:
+          version: "0.16.8"
+          args: format --check --diff
+
+  tests:
+    name: Tests (Odoo 20.0 + PostgreSQL 16)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      # Misma imagen que docker-compose.yml, con caché de capas entre corridas.
+      - name: Construir la imagen de Odoo 20.0
+        uses: docker/build-push-action@v7
+        with:
+          context: docker
+          tags: obrador-odoo:20.0
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Instalar el módulo (con datos demo) y correr los tests
+        run: |
+          set -o pipefail
+          docker compose run --rm odoo \
+            -d test_obrador -i obrador --with-demo \
+            --test-tags /obrador --stop-after-init 2>&1 | tee odoo-tests.log
+
+      # Odoo sale con código != 0 si fallan tests; además se rechaza cualquier
+      # ERROR o CRITICAL en el log (por ejemplo, datos demo o vistas inválidas).
+      - name: Revisar errores en el log
+        run: |
+          if grep -E "^[0-9-]+ [0-9:,]+ [0-9]+ (ERROR|CRITICAL) " odoo-tests.log; then
+            echo "::error::El log de Odoo contiene errores"
+            exit 1
+          fi
+
+      - name: Publicar el log
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: odoo-tests-log
+          path: odoo-tests.log
