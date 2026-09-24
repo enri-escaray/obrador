@@ -1,0 +1,48 @@
+# Entorno de desarrollo: Odoo 20.0 + PostgreSQL 16.
+#
+#   docker compose up -d          -> http://localhost:8069 (admin / admin)
+#
+# Todas las variables tienen un valor por defecto; se pueden sobrescribir con un
+# archivo .env junto a este (POSTGRES_USER, POSTGRES_PASSWORD, ODOO_DB, ODOO_PORT).
+name: obrador
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_USER:-odoo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-odoo}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  odoo:
+    build: ./docker
+    image: obrador-odoo:20.0
+    depends_on:
+      db:
+        condition: service_healthy
+    # En el primer arranque crea la base, instala el módulo y carga datos de
+    # ejemplo. En los siguientes, -i no hace nada porque el módulo ya está instalado.
+    command: ["-i", "obrador", "--with-demo"]
+    environment:
+      PGHOST: db
+      PGPORT: "5432"
+      PGUSER: ${POSTGRES_USER:-odoo}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-odoo}
+      PGDATABASE: ${ODOO_DB:-obrador}
+    ports:
+      - "${ODOO_PORT:-8069}:8069"
+    volumes:
+      - ./config/odoo.conf:/etc/odoo/odoo.conf:ro
+      - ./addons:/mnt/extra-addons:ro
+      - odoo-data:/var/lib/odoo
+
+volumes:
+  db-data:
+  odoo-data:

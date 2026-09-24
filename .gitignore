@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Herramientas
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Entorno local
+.env
+*.log
+
+# Editores y sistema
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
