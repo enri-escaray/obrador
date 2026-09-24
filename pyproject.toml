@@ -1,0 +1,30 @@
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# Convenciones de Odoo: los __init__.py importan submódulos para registrarlos
+# y el manifiesto es un diccionario suelto.
+"__init__.py" = ["F401"]
+"__manifest__.py" = ["B018"]
+
+[tool.ruff.lint.isort]
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "odoo",
+    "odoo-addons",
+    "first-party",
+    "local-folder",
+]
+
+[tool.ruff.lint.isort.sections]
+odoo = ["odoo"]
+"odoo-addons" = ["odoo.addons"]
+
+[tool.ruff.format]
+quote-style = "preserve"
