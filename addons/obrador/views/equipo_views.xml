@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="equipo_view_list" model="ir.ui.view">
+        <field name="name">obrador.equipo.list</field>
+        <field name="model">obrador.equipo</field>
+        <field name="arch" type="xml">
+            <list string="Equipos">
+                <field name="codigo"/>
+                <field name="name"/>
+                <field name="tipo"/>
+                <field name="costo_hora"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="equipo_view_form" model="ir.ui.view">
+        <field name="name">obrador.equipo.form</field>
+        <field name="model">obrador.equipo</field>
+        <field name="arch" type="xml">
+            <form string="Equipo">
+                <sheet>
+                    <widget name="web_ribbon" title="Archivado" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Ej.: Retroexcavadora CAT 416"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="codigo"/>
+                            <field name="tipo"/>
+                        </group>
+                        <group>
+                            <field name="costo_hora"/>
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="equipo_view_search" model="ir.ui.view">
+        <field name="name">obrador.equipo.search</field>
+        <field name="model">obrador.equipo</field>
+        <field name="arch" type="xml">
+            <search string="Buscar equipos">
+                <field name="name" filter_domain="['|', ('name', 'ilike', self), ('codigo', 'ilike', self)]"/>
+                <field name="tipo"/>
+                <filter name="archivados" string="Archivados" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="agrupar_tipo" string="Tipo" context="{'group_by': 'tipo'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_equipo" model="ir.actions.act_window">
+        <field name="name">Equipos</field>
+        <field name="res_model">obrador.equipo</field>
+        <field name="path">obrador-equipos</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="equipo_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Registrá los equipos de la empresa</p>
+            <p>Retroexcavadoras, grúas, hormigoneras... con su costo por hora de uso.</p>
+        </field>
+    </record>
+
+    <!-- Materiales: productos de Odoo de tipo "bienes". -->
+    <record id="action_material" model="ir.actions.act_window">
+        <field name="name">Materiales</field>
+        <field name="res_model">product.product</field>
+        <field name="path">obrador-materiales</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('type', '=', 'consu')]</field>
+        <field name="context">{'default_type': 'consu'}</field>
+    </record>
+</odoo>

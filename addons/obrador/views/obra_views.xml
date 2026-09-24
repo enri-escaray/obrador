@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="obra_view_list" model="ir.ui.view">
+        <field name="name">obrador.obra.list</field>
+        <field name="model">obrador.obra</field>
+        <field name="arch" type="xml">
+            <list string="Obras" sample="1">
+                <field name="codigo"/>
+                <field name="name"/>
+                <field name="cliente_id"/>
+                <field name="responsable_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="fecha_inicio" optional="show"/>
+                <field name="fecha_fin_prevista" optional="hide"/>
+                <field name="avance_actual" widget="progressbar"/>
+                <field name="fecha_ultimo_parte" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                <field name="estado" widget="badge"
+                       decoration-info="estado == 'planificada'"
+                       decoration-success="estado == 'en_curso'"
+                       decoration-warning="estado == 'suspendida'"
+                       decoration-muted="estado in ('finalizada', 'cancelada')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="obra_view_form" model="ir.ui.view">
+        <field name="name">obrador.obra.form</field>
+        <field name="model">obrador.obra</field>
+        <field name="arch" type="xml">
+            <form string="Obra">
+                <header>
+                    <button name="action_iniciar" type="object" string="Iniciar obra" class="btn-primary"
+                            invisible="estado != 'planificada'" groups="obrador.group_obrador_responsable"/>
+                    <button name="action_reanudar" type="object" string="Reanudar" class="btn-primary"
+                            invisible="estado != 'suspendida'" groups="obrador.group_obrador_responsable"/>
+                    <button name="action_suspender" type="object" string="Suspender"
+                            invisible="estado != 'en_curso'" groups="obrador.group_obrador_responsable"/>
+                    <button name="action_finalizar" type="object" string="Finalizar"
+                            invisible="estado not in ('en_curso', 'suspendida')"
+                            groups="obrador.group_obrador_responsable"
+                            confirm="¿Finalizar la obra? No se podrán cargar más partes diarios."/>
+                    <button name="action_cancelar" type="object" string="Cancelar obra"
+                            invisible="estado in ('finalizada', 'cancelada')"
+                            groups="obrador.group_obrador_responsable"
+                            confirm="¿Cancelar la obra?"/>
+                    <field name="estado" widget="statusbar" statusbar_visible="planificada,en_curso,finalizada"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_ver_partes" type="object" class="oe_stat_button" icon="fa-clipboard">
+                            <field name="parte_count" widget="statinfo" string="Partes diarios"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archivada" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <span class="text-muted"><field name="codigo" readonly="1"/></span>
+                        <h1><field name="name" placeholder="Ej.: Edificio Av. Mitre 1450"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="cliente_id"/>
+                            <field name="responsable_id" widget="many2one_avatar_user"/>
+                            <field name="direccion"/>
+                            <field name="presupuesto"/>
+                        </group>
+                        <group>
+                            <field name="fecha_inicio"/>
+                            <field name="fecha_fin_prevista"/>
+                            <field name="avance_actual" widget="progressbar"/>
+                            <field name="fecha_ultimo_parte"/>
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Descripción" name="descripcion">
+                            <field name="descripcion" placeholder="Alcance, etapas, condiciones de acceso..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="obra_view_search" model="ir.ui.view">
+        <field name="name">obrador.obra.search</field>
+        <field name="model">obrador.obra</field>
+        <field name="arch" type="xml">
+            <search string="Buscar obras">
+                <field name="name" string="Obra" filter_domain="['|', ('name', 'ilike', self), ('codigo', 'ilike', self)]"/>
+                <field name="cliente_id"/>
+                <field name="responsable_id"/>
+                <filter name="mis_obras" string="Mis obras" domain="[('responsable_id', '=', uid)]"/>
+                <separator/>
+                <filter name="planificadas" string="Planificadas" domain="[('estado', '=', 'planificada')]"/>
+                <filter name="en_curso" string="En curso" domain="[('estado', '=', 'en_curso')]"/>
+                <filter name="suspendidas" string="Suspendidas" domain="[('estado', '=', 'suspendida')]"/>
+                <filter name="finalizadas" string="Finalizadas" domain="[('estado', '=', 'finalizada')]"/>
+                <separator/>
+                <filter name="archivadas" string="Archivadas" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="agrupar_estado" string="Estado" context="{'group_by': 'estado'}"/>
+                    <filter name="agrupar_cliente" string="Cliente" context="{'group_by': 'cliente_id'}"/>
+                    <filter name="agrupar_responsable" string="Jefe de obra" context="{'group_by': 'responsable_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_obra" model="ir.actions.act_window">
+        <field name="name">Obras</field>
+        <field name="res_model">obrador.obra</field>
+        <field name="path">obrador-obras</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="obra_view_search"/>
+        <field name="context">{'search_default_en_curso': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Registrá tu primera obra</p>
+            <p>Cada obra agrupa sus partes diarios, el consumo de materiales y el uso de equipos.</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Clientes -->
+    <record id="cliente_desarrollos_sur" model="res.partner">
+        <field name="name">Desarrollos del Sur S.A.</field>
+        <field name="is_company" eval="True"/>
+        <field name="city">Rosario</field>
+    </record>
+
+    <record id="cliente_logistica_norte" model="res.partner">
+        <field name="name">Logística Norte S.R.L.</field>
+        <field name="is_company" eval="True"/>
+        <field name="city">Córdoba</field>
+    </record>
+
+    <!-- Materiales -->
+    <record id="material_cemento" model="product.product">
+        <field name="name">Cemento Portland (bolsa 50 kg)</field>
+        <field name="type">consu</field>
+        <field name="uom_id" ref="uom.product_uom_unit"/>
+    </record>
+
+    <record id="material_arena" model="product.product">
+        <field name="name">Arena gruesa</field>
+        <field name="type">consu</field>
+        <field name="uom_id" ref="uom.product_uom_cubic_meter"/>
+    </record>
+
+    <record id="material_hormigon" model="product.product">
+        <field name="name">Hormigón elaborado H-21</field>
+        <field name="type">consu</field>
+        <field name="uom_id" ref="uom.product_uom_cubic_meter"/>
+    </record>
+
+    <record id="material_hierro" model="product.product">
+        <field name="name">Hierro ADN 420 Ø 8 mm (barra 12 m)</field>
+        <field name="type">consu</field>
+        <field name="uom_id" ref="uom.product_uom_unit"/>
+    </record>
+
+    <record id="material_ladrillo" model="product.product">
+        <field name="name">Ladrillo hueco 12x18x33</field>
+        <field name="type">consu</field>
+        <field name="uom_id" ref="uom.product_uom_unit"/>
+    </record>
+
+    <!-- Equipos -->
+    <record id="equipo_retroexcavadora" model="obrador.equipo">
+        <field name="name">Retroexcavadora CAT 416</field>
+        <field name="codigo">EQ-001</field>
+        <field name="tipo">retroexcavadora</field>
+        <field name="costo_hora">65</field>
+    </record>
+
+    <record id="equipo_grua" model="obrador.equipo">
+        <field name="name">Grúa torre Potain</field>
+        <field name="codigo">EQ-002</field>
+        <field name="tipo">grua</field>
+        <field name="costo_hora">90</field>
+    </record>
+
+    <record id="equipo_hormigonera" model="obrador.equipo">
+        <field name="name">Hormigonera 350 L</field>
+        <field name="codigo">EQ-003</field>
+        <field name="tipo">hormigonera</field>
+        <field name="costo_hora">12</field>
+    </record>
+
+    <record id="equipo_camion" model="obrador.equipo">
+        <field name="name">Camión volcador</field>
+        <field name="codigo">EQ-004</field>
+        <field name="tipo">camion</field>
+        <field name="costo_hora">45</field>
+    </record>
+
+    <!-- Obras -->
+    <record id="obra_edificio_mitre" model="obrador.obra">
+        <field name="name">Edificio Mitre 1450</field>
+        <field name="cliente_id" ref="cliente_desarrollos_sur"/>
+        <field name="responsable_id" ref="base.user_admin"/>
+        <field name="direccion">Av. Mitre 1450, Rosario</field>
+        <field name="fecha_inicio" eval="(DateTime.today() - relativedelta(days=60)).strftime('%Y-%m-%d')"/>
+        <field name="fecha_fin_prevista" eval="(DateTime.today() + relativedelta(months=10)).strftime('%Y-%m-%d')"/>
+        <field name="presupuesto">1250000</field>
+        <field name="estado">en_curso</field>
+        <field name="descripcion" type="html">
+            <p>Edificio de 8 pisos con cocheras en subsuelo. Estructura de hormigón armado.</p>
+        </field>
+    </record>
+
+    <record id="obra_nave_industrial" model="obrador.obra">
+        <field name="name">Nave industrial Parque Norte</field>
+        <field name="cliente_id" ref="cliente_logistica_norte"/>
+        <field name="responsable_id" ref="base.user_admin"/>
+        <field name="direccion">Parque Industrial Norte, lote 14</field>
+        <field name="fecha_inicio" eval="(DateTime.today() - relativedelta(days=20)).strftime('%Y-%m-%d')"/>
+        <field name="fecha_fin_prevista" eval="(DateTime.today() + relativedelta(months=5)).strftime('%Y-%m-%d')"/>
+        <field name="presupuesto">480000</field>
+        <field name="estado">en_curso</field>
+    </record>
+
+    <record id="obra_escuela" model="obrador.obra">
+        <field name="name">Ampliación Escuela N.º 12</field>
+        <field name="responsable_id" ref="base.user_admin"/>
+        <field name="direccion">Belgrano 230</field>
+        <field name="fecha_inicio" eval="(DateTime.today() + relativedelta(days=15)).strftime('%Y-%m-%d')"/>
+        <field name="presupuesto">210000</field>
+    </record>
+
+    <!-- Partes diarios -->
+    <record id="parte_mitre_1" model="obrador.parte.diario">
+        <field name="obra_id" ref="obra_edificio_mitre"/>
+        <field name="fecha" eval="(DateTime.today() - relativedelta(days=4)).strftime('%Y-%m-%d')"/>
+        <field name="avance">31.5</field>
+        <field name="clima">soleado</field>
+        <field name="observaciones">Armado de hierros y encofrado de la losa del 3.er piso.</field>
+        <field name="consumo_ids" eval="[
+            Command.create({'product_id': ref('material_hierro'), 'cantidad': 60}),
+            Command.create({'product_id': ref('material_cemento'), 'cantidad': 25}),
+        ]"/>
+        <field name="uso_equipo_ids" eval="[
+            Command.create({'equipo_id': ref('equipo_grua'), 'horas': 7, 'operador': 'Walter Gómez'}),
+        ]"/>
+    </record>
+
+    <record id="parte_mitre_2" model="obrador.parte.diario">
+        <field name="obra_id" ref="obra_edificio_mitre"/>
+        <field name="fecha" eval="(DateTime.today() - relativedelta(days=3)).strftime('%Y-%m-%d')"/>
+        <field name="avance">33.0</field>
+        <field name="clima">nublado</field>
+        <field name="observaciones">Hormigonado de la losa del 3.er piso. Ingresaron 18 m³ de H-21.</field>
+        <field name="consumo_ids" eval="[
+            Command.create({'product_id': ref('material_hormigon'), 'cantidad': 18}),
+        ]"/>
+        <field name="uso_equipo_ids" eval="[
+            Command.create({'equipo_id': ref('equipo_grua'), 'horas': 8, 'operador': 'Walter Gómez'}),
+            Command.create({'equipo_id': ref('equipo_hormigonera'), 'horas': 3.5}),
+        ]"/>
+    </record>
+
+    <record id="parte_mitre_3" model="obrador.parte.diario">
+        <field name="obra_id" ref="obra_edificio_mitre"/>
+        <field name="fecha" eval="(DateTime.today() - relativedelta(days=2)).strftime('%Y-%m-%d')"/>
+        <field name="avance">33.0</field>
+        <field name="clima">lluvia</field>
+        <field name="observaciones">Lluvia desde las 10 h: se suspendieron las tareas exteriores. Curado de losa.</field>
+    </record>
+
+    <record id="parte_mitre_4" model="obrador.parte.diario">
+        <field name="obra_id" ref="obra_edificio_mitre"/>
+        <field name="fecha" eval="(DateTime.today() - relativedelta(days=1)).strftime('%Y-%m-%d')"/>
+        <field name="avance">34.2</field>
+        <field name="clima">soleado</field>
+        <field name="observaciones">Mampostería de planta baja y desencofrado parcial del 2.º piso.</field>
+        <field name="consumo_ids" eval="[
+            Command.create({'product_id': ref('material_ladrillo'), 'cantidad': 1200}),
+            Command.create({'product_id': ref('material_cemento'), 'cantidad': 30}),
+            Command.create({'product_id': ref('material_arena'), 'cantidad': 4}),
+        ]"/>
+        <field name="uso_equipo_ids" eval="[
+            Command.create({'equipo_id': ref('equipo_hormigonera'), 'horas': 6}),
+        ]"/>
+    </record>
+
+    <record id="parte_nave_1" model="obrador.parte.diario">
+        <field name="obra_id" ref="obra_nave_industrial"/>
+        <field name="fecha" eval="(DateTime.today() - relativedelta(days=2)).strftime('%Y-%m-%d')"/>
+        <field name="avance">8.0</field>
+        <field name="clima">viento</field>
+        <field name="observaciones">Excavación de bases y retiro de suelo.</field>
+        <field name="uso_equipo_ids" eval="[
+            Command.create({'equipo_id': ref('equipo_retroexcavadora'), 'horas': 8, 'operador': 'Carlos Díaz'}),
+            Command.create({'equipo_id': ref('equipo_camion'), 'horas': 5}),
+        ]"/>
+    </record>
+
+    <!-- El jefe de obra confirma los partes revisados; el último queda en borrador. -->
+    <function model="obrador.parte.diario" name="action_confirmar"
+              eval="[[ref('parte_mitre_1'), ref('parte_mitre_2'), ref('parte_mitre_3'), ref('parte_nave_1')]]"/>
+</odoo>
