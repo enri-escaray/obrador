@@ -1,0 +1,14 @@
+id,name,model_id,group_id/id,operation,domain
+access_obra_usuario,Obras: consulta,obrador.obra,group_obrador_usuario,r,
+access_obra_responsable,Obras: gestión,obrador.obra,group_obrador_responsable,crud,
+access_parte_usuario,Partes diarios: carga,obrador.parte.diario,group_obrador_usuario,cru,
+access_parte_responsable,Partes diarios: gestión,obrador.parte.diario,group_obrador_responsable,crud,
+access_consumo_usuario,Consumo de materiales: carga,obrador.consumo.material,group_obrador_usuario,crud,
+access_uso_equipo_usuario,Uso de equipos: carga,obrador.uso.equipo,group_obrador_usuario,crud,
+access_equipo_usuario,Equipos: consulta,obrador.equipo,group_obrador_usuario,r,
+access_equipo_responsable,Equipos: gestión,obrador.equipo,group_obrador_responsable,crud,
+restriccion_obra_compania,Obras: multi-compañía,obrador.obra,,crud,"[('company_id', 'in', company_ids + [False])]"
+restriccion_parte_compania,Partes diarios: multi-compañía,obrador.parte.diario,,crud,"[('company_id', 'in', company_ids + [False])]"
+restriccion_consumo_compania,Consumo de materiales: multi-compañía,obrador.consumo.material,,crud,"[('company_id', 'in', company_ids + [False])]"
+restriccion_uso_equipo_compania,Uso de equipos: multi-compañía,obrador.uso.equipo,,crud,"[('company_id', 'in', company_ids + [False])]"
+restriccion_equipo_compania,Equipos: multi-compañía,obrador.equipo,,crud,"[('company_id', 'in', company_ids + [False])]"

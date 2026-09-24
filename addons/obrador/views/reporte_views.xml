@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Consumo de materiales -->
+    <record id="consumo_material_view_list" model="ir.ui.view">
+        <field name="name">obrador.consumo.material.list</field>
+        <field name="model">obrador.consumo.material</field>
+        <field name="arch" type="xml">
+            <list string="Consumo de materiales" create="0" edit="0">
+                <field name="fecha"/>
+                <field name="obra_id"/>
+                <field name="parte_id"/>
+                <field name="product_id"/>
+                <field name="cantidad" sum="Total"/>
+                <field name="uom_id"/>
+                <field name="notas" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="consumo_material_view_pivot" model="ir.ui.view">
+        <field name="name">obrador.consumo.material.pivot</field>
+        <field name="model">obrador.consumo.material</field>
+        <field name="arch" type="xml">
+            <pivot string="Consumo de materiales" sample="1">
+                <field name="obra_id" type="row"/>
+                <field name="product_id" type="col"/>
+                <field name="cantidad" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="consumo_material_view_search" model="ir.ui.view">
+        <field name="name">obrador.consumo.material.search</field>
+        <field name="model">obrador.consumo.material</field>
+        <field name="arch" type="xml">
+            <search string="Consumo de materiales">
+                <field name="obra_id"/>
+                <field name="product_id"/>
+                <filter name="filtro_fecha" string="Fecha" date="fecha"/>
+                <group>
+                    <filter name="agrupar_obra" string="Obra" context="{'group_by': 'obra_id'}"/>
+                    <filter name="agrupar_material" string="Material" context="{'group_by': 'product_id'}"/>
+                    <filter name="agrupar_mes" string="Mes" context="{'group_by': 'fecha:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_consumo_material" model="ir.actions.act_window">
+        <field name="name">Consumo de materiales</field>
+        <field name="res_model">obrador.consumo.material</field>
+        <field name="path">obrador-consumos</field>
+        <field name="view_mode">pivot,list</field>
+        <field name="search_view_id" ref="consumo_material_view_search"/>
+    </record>
+
+    <!-- Uso de equipos -->
+    <record id="uso_equipo_view_list" model="ir.ui.view">
+        <field name="name">obrador.uso.equipo.list</field>
+        <field name="model">obrador.uso.equipo</field>
+        <field name="arch" type="xml">
+            <list string="Uso de equipos" create="0" edit="0">
+                <field name="fecha"/>
+                <field name="obra_id"/>
+                <field name="parte_id"/>
+                <field name="equipo_id"/>
+                <field name="operador" optional="show"/>
+                <field name="horas" widget="float_time" sum="Total"/>
+                <field name="costo" sum="Total"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="uso_equipo_view_pivot" model="ir.ui.view">
+        <field name="name">obrador.uso.equipo.pivot</field>
+        <field name="model">obrador.uso.equipo</field>
+        <field name="arch" type="xml">
+            <pivot string="Uso de equipos" sample="1">
+                <field name="equipo_id" type="row"/>
+                <field name="obra_id" type="col"/>
+                <field name="horas" type="measure"/>
+                <field name="costo" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="uso_equipo_view_search" model="ir.ui.view">
+        <field name="name">obrador.uso.equipo.search</field>
+        <field name="model">obrador.uso.equipo</field>
+        <field name="arch" type="xml">
+            <search string="Uso de equipos">
+                <field name="obra_id"/>
+                <field name="equipo_id"/>
+                <field name="operador"/>
+                <filter name="filtro_fecha" string="Fecha" date="fecha"/>
+                <group>
+                    <filter name="agrupar_obra" string="Obra" context="{'group_by': 'obra_id'}"/>
+                    <filter name="agrupar_equipo" string="Equipo" context="{'group_by': 'equipo_id'}"/>
+                    <filter name="agrupar_mes" string="Mes" context="{'group_by': 'fecha:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_uso_equipo" model="ir.actions.act_window">
+        <field name="name">Uso de equipos</field>
+        <field name="res_model">obrador.uso.equipo</field>
+        <field name="path">obrador-uso-equipos</field>
+        <field name="view_mode">pivot,list</field>
+        <field name="search_view_id" ref="uso_equipo_view_search"/>
+    </record>
+</odoo>

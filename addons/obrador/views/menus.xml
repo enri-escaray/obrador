@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_obrador_raiz"
+              name="Obrador"
+              web_icon="obrador,static/description/icon.png"
+              groups="group_obrador_usuario"
+              sequence="45"/>
+
+    <menuitem id="menu_obrador_operacion" name="Operación" parent="menu_obrador_raiz" sequence="10"/>
+    <menuitem id="menu_obrador_obras" name="Obras" parent="menu_obrador_operacion"
+              action="action_obra" sequence="10"/>
+    <menuitem id="menu_obrador_partes" name="Partes diarios" parent="menu_obrador_operacion"
+              action="action_parte_diario" sequence="20"/>
+
+    <menuitem id="menu_obrador_reportes" name="Reportes" parent="menu_obrador_raiz" sequence="20"/>
+    <menuitem id="menu_obrador_consumos" name="Consumo de materiales" parent="menu_obrador_reportes"
+              action="action_consumo_material" sequence="10"/>
+    <menuitem id="menu_obrador_uso_equipos" name="Uso de equipos" parent="menu_obrador_reportes"
+              action="action_uso_equipo" sequence="20"/>
+
+    <menuitem id="menu_obrador_configuracion" name="Configuración" parent="menu_obrador_raiz"
+              groups="group_obrador_responsable" sequence="90"/>
+    <menuitem id="menu_obrador_equipos" name="Equipos" parent="menu_obrador_configuracion"
+              action="action_equipo" sequence="10"/>
+    <menuitem id="menu_obrador_materiales" name="Materiales" parent="menu_obrador_configuracion"
+              action="action_material" sequence="20"/>
+</odoo>

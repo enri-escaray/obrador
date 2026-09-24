@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="parte_diario_view_list" model="ir.ui.view">
+        <field name="name">obrador.parte.diario.list</field>
+        <field name="model">obrador.parte.diario</field>
+        <field name="arch" type="xml">
+            <list string="Partes diarios" sample="1">
+                <field name="fecha"/>
+                <field name="name"/>
+                <field name="obra_id"/>
+                <field name="avance" widget="progressbar"/>
+                <field name="clima" optional="show"/>
+                <field name="horas_equipo" optional="hide" sum="Total"/>
+                <field name="costo_equipos" optional="show" sum="Total"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="create_uid" string="Cargado por" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="estado" widget="badge"
+                       decoration-info="estado == 'borrador'"
+                       decoration-success="estado == 'confirmado'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="parte_diario_view_form" model="ir.ui.view">
+        <field name="name">obrador.parte.diario.form</field>
+        <field name="model">obrador.parte.diario</field>
+        <field name="arch" type="xml">
+            <form string="Parte diario">
+                <header>
+                    <button name="action_confirmar" type="object" string="Confirmar" class="btn-primary"
+                            invisible="estado != 'borrador' or not id"
+                            groups="obrador.group_obrador_responsable"/>
+                    <button name="action_volver_borrador" type="object" string="Volver a borrador"
+                            invisible="estado != 'confirmado'"
+                            groups="obrador.group_obrador_responsable"/>
+                    <field name="estado" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="obra_id" readonly="estado == 'confirmado'" options="{'no_create': True}"/>
+                            <field name="fecha" readonly="estado == 'confirmado'"/>
+                            <field name="clima" readonly="estado == 'confirmado'"/>
+                        </group>
+                        <group>
+                            <field name="avance" readonly="estado == 'confirmado'"/>
+                            <field name="horas_equipo" widget="float_time"/>
+                            <field name="costo_equipos"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Observaciones" name="observaciones">
+                            <field name="observaciones" readonly="estado == 'confirmado'"
+                                   placeholder="Tareas realizadas, novedades, incidentes, visitas..."/>
+                        </page>
+                        <page string="Materiales" name="materiales">
+                            <field name="consumo_ids" readonly="estado == 'confirmado'">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="cantidad"/>
+                                    <field name="uom_id"/>
+                                    <field name="notas" optional="show"/>
+                                    <field name="company_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Equipos" name="equipos">
+                            <field name="uso_equipo_ids" readonly="estado == 'confirmado'">
+                                <list editable="bottom">
+                                    <field name="equipo_id"/>
+                                    <field name="horas" widget="float_time"/>
+                                    <field name="operador" optional="show"/>
+                                    <field name="costo_hora" optional="show"/>
+                                    <field name="costo" sum="Total"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="company_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="parte_diario_view_search" model="ir.ui.view">
+        <field name="name">obrador.parte.diario.search</field>
+        <field name="model">obrador.parte.diario</field>
+        <field name="arch" type="xml">
+            <search string="Buscar partes diarios">
+                <field name="obra_id"/>
+                <field name="name"/>
+                <field name="observaciones"/>
+                <filter name="borradores" string="Borradores" domain="[('estado', '=', 'borrador')]"/>
+                <filter name="confirmados" string="Confirmados" domain="[('estado', '=', 'confirmado')]"/>
+                <separator/>
+                <filter name="filtro_fecha" string="Fecha" date="fecha"/>
+                <group>
+                    <filter name="agrupar_obra" string="Obra" context="{'group_by': 'obra_id'}"/>
+                    <filter name="agrupar_estado" string="Estado" context="{'group_by': 'estado'}"/>
+                    <filter name="agrupar_fecha" string="Fecha" context="{'group_by': 'fecha:week'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="parte_diario_view_graph" model="ir.ui.view">
+        <field name="name">obrador.parte.diario.graph</field>
+        <field name="model">obrador.parte.diario</field>
+        <field name="arch" type="xml">
+            <graph string="Curva de avance" type="line" stacked="0" sample="1">
+                <field name="fecha" interval="day"/>
+                <field name="obra_id"/>
+                <field name="avance" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_parte_diario" model="ir.actions.act_window">
+        <field name="name">Partes diarios</field>
+        <field name="res_model">obrador.parte.diario</field>
+        <field name="path">obrador-partes</field>
+        <field name="view_mode">list,form,graph</field>
+        <field name="search_view_id" ref="parte_diario_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Cargá el primer parte diario</p>
+            <p>El parte diario registra el avance de la obra, el clima, las novedades del día,
+                los materiales consumidos y las horas de uso de cada equipo.</p>
+        </field>
+    </record>
+</odoo>

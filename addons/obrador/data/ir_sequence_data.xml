@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="seq_obrador_obra" model="ir.sequence">
+        <field name="name">Obras</field>
+        <field name="code">obrador.obra</field>
+        <field name="prefix">OB-</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_obrador_parte_diario" model="ir.sequence">
+        <field name="name">Partes diarios</field>
+        <field name="code">obrador.parte.diario</field>
+        <field name="prefix">PD/%(year)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>
